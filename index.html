@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="samistore - Online Store">
-    <meta name="keywords" content="samistore, samimhd, shop jijel, samimhd263
-        ">
+    <meta name="description" content="samistore - متجر إلكتروني للتسوق">
+    <meta name="keywords" content="samistore, samimhd, shop jijel, samimhd263">
     <title>samistore</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
@@ -114,7 +113,7 @@
     <div class="role-overlay" id="roleOverlay">
         <div class="role-box">
             <h2>مرحباً بك في samistore</h2>
-            <button class="role-btn btn-buyer" onclick="setRole('buyer')">إضغط هنا🛒</button>
+            <button class="role-btn btn-buyer" onclick="setRole('buyer')">إضغط هنا 🛒</button>
             <button class="role-btn btn-admin" onclick="showAdminPassInput()">خاص بصاحب الموقع 🔑</button>
             
             <input type="password" id="adminPassword" class="pass-input" placeholder="أدخل كلمة السر ">
@@ -316,6 +315,11 @@
                 return;
             }
 
+            if (file.size > 1000000) {
+                alert('حجم الصورة كبير جداً! يرجى اختيار صورة بحجم أقل من 1 ميجابايت.');
+                return;
+            }
+
             const btn = document.getElementById('saveProductBtn');
             btn.innerText = "جاري الحفظ والنشر...";
             btn.disabled = true;
@@ -324,23 +328,28 @@
             reader.onload = async function(e) {
                 const imgBase64 = e.target.result;
 
-                await addDoc(collection(db, "products"), {
-                    name: name,
-                    price: price,
-                    category: category,
-                    img: imgBase64
-                });
+                try {
+                    await addDoc(collection(db, "products"), {
+                        name: name,
+                        price: price,
+                        category: category,
+                        img: imgBase64
+                    });
 
-                document.getElementById('pName').value = '';
-                document.getElementById('pPrice').value = '';
-                document.getElementById('pCategory').value = '';
-                fileInput.value = '';
-                
-                btn.innerText = "حفظ ونشر المنتج";
-                btn.disabled = false;
-
-                toggleAdminModal();
-                await fetchProducts();
+                    document.getElementById('pName').value = '';
+                    document.getElementById('pPrice').value = '';
+                    document.getElementById('pCategory').value = '';
+                    fileInput.value = '';
+                    
+                    toggleAdminModal();
+                    await fetchProducts();
+                } catch (err) {
+                    alert('حدث خطأ أثناء حفظ المنتج، يرجى المحاولة مرة أخرى.');
+                    console.error(err);
+                } finally {
+                    btn.innerText = "حفظ ونشر المنتج";
+                    btn.disabled = false;
+                }
             };
 
             reader.readAsDataURL(file);
