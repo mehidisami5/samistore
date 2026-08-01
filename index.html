@@ -138,17 +138,6 @@
 
         <h2 style="margin-bottom: 1.5rem;">المنتجات المعروضة</h2>
         <div class="products-grid" id="productsGrid"></div>
-        <div class="product-card" data-category="الالكترونيات">
-    <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300" alt="infinix hot 50">
-    <h3>infinix hot 50</h3>
-    <p class="description">مستعمل</p>
-    <p class="price">23000 DA</p>
-    <button class="add-to-cart-btn">إضافة للسلّة</button>
-    <button class="delete-btn" onclick="this.parentElement.remove()" style="background: red; color: white; border: none; padding: 5px 10px; margin-top: 5px; cursor: pointer; border-radius: 4px;">حذف المنتج</button>
-        </div>
-        
-        
-        
     </div>
 
     <!-- شريط تنقل سفلي لتغيير الصفة -->
@@ -165,7 +154,7 @@
         </div>
         <input type="text" id="pName" placeholder="اسم المنتج" required>
         <input type="number" id="pPrice" placeholder="السعر (د.ج)" required>
-        <input type="text" id="pCategory" placeholder="الفئة (مثال: إلكترونيات، ملابس)" required>
+        <input type="text" id="pCategory" placeholder="الفئة (مثال: الإلكترونيات، ملابس)" required>
         
         <label style="display:block; margin-top:8px; font-size:0.85rem; color:#555;">اختر صورة من جهازك:</label>
         <input type="file" id="pFile" accept="image/*" required>
@@ -188,20 +177,28 @@
 
     <script>
         const MY_PHONE_NUMBER = "213555601331";
-        const ADMIN_PASS = "2012"; // كلمة السر الخاصة بالمسؤول (يمكنك تغييرها)
+        const ADMIN_PASS = "2012";
 
-        let products = JSON.parse(localStorage.getItem('myProducts')) || [];
+        // المنتج الأساسي (Infinix Hot 50) افتراضياً إذا كان المتجر فارغاً
+        const defaultProducts = [
+            {
+                name: "infinix hot 50",
+                price: 23000,
+                category: "الإلكترونيات",
+                img: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300"
+            }
+        ];
+
+        let products = JSON.parse(localStorage.getItem('myProducts')) || defaultProducts;
         let cart = [];
         let currentCategory = "الكل";
         let isAdmin = false;
 
-        // إظهار حقل كلمة السر للمسؤول
         function showAdminPassInput() {
             document.getElementById('adminPassword').style.display = 'block';
             document.getElementById('passSubmitBtn').style.display = 'block';
         }
 
-        // التحقق من كلمة السر
         function verifyAdmin() {
             const pass = document.getElementById('adminPassword').value;
             if (pass === ADMIN_PASS) {
@@ -211,14 +208,12 @@
             }
         }
 
-        // ضبط نوع المستخدم
         function setRole(role) {
             isAdmin = (role === 'admin');
             document.getElementById('roleOverlay').style.display = 'none';
             document.getElementById('adminAddBtn').style.display = isAdmin ? 'block' : 'none';
             document.getElementById('currentRoleText').innerText = isAdmin ? 'مسؤول (صاحب الموقع)' : 'مشتري';
             
-            // إعادة ضبط الحقول
             document.getElementById('adminPassword').value = '';
             document.getElementById('adminPassword').style.display = 'none';
             document.getElementById('passSubmitBtn').style.display = 'none';
@@ -371,7 +366,10 @@
             const modal = document.getElementById('adminModal');
             modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
         }
+
+        // تشغيل البداية
+        renderCategories();
+        renderProducts();
     </script>
 </body>
 </html>
-
