@@ -181,13 +181,8 @@
 
         // المنتج الأساسي (Infinix Hot 50) افتراضياً إذا كان المتجر فارغاً
         const defaultProducts = [
-            {
-                name: "infinix hot 50",
-                price: 23000,
-                category: "الإلكترونيات",
-                img: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300"
-            }
-        ];
+            
+        ]
 
         let products = JSON.parse(localStorage.getItem('myProducts')) || defaultProducts;
         let cart = [];
