@@ -3,368 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="samistore - Online Store">
-    <meta name="keywords" content="samistore, store, shop, online store">
-    <title>samistore</title>
+    <title>Sami Store</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        body { background-color: #f8f9fa; color: #333; padding-bottom: 60px; }
-
-        /* شاشة تحديد الصفة وكلمة السر */
-        .role-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(26, 26, 46, 0.95); z-index: 200;
-            display: flex; justify-content: center; align-items: center; padding: 1rem;
-        }
-        .role-box {
-            background: white; padding: 2rem; border-radius: 12px;
-            text-align: center; max-width: 400px; width: 100%; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-        .role-box h2 { margin-bottom: 1.5rem; color: #1a1a2e; }
-        .role-btn {
-            width: 100%; padding: 12px; margin: 8px 0; border: none;
-            border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1rem;
-        }
-        .btn-buyer { background: #27ae60; color: white; }
-        .btn-admin { background: #4e54c8; color: white; }
-        .pass-input {
-            width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc;
-            border-radius: 5px; display: none; text-align: center;
-        }
-
-        /* الهيدر */
-        header {
-            background-color: #1a1a2e; color: white; padding: 1rem 2rem;
-            position: sticky; top: 0; z-index: 100;
-            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
-        }
-        .logo { font-size: 1.5rem; font-weight: bold; color: #4e54c8; }
-        .header-btns { display: flex; gap: 10px; align-items: center; }
-        .cart-icon, .admin-btn {
-            background: #16213e; color: white; border: none; padding: 8px 15px;
-            border-radius: 20px; cursor: pointer; font-weight: bold;
-        }
-        .admin-btn { background: #4e54c8; }
-        .cart-count { background: #e94560; border-radius: 50%; padding: 2px 6px; font-size: 0.8rem; }
-
-        /* شريط البحث والتصفية */
-        .container { max-width: 1200px; margin: 1.5rem auto; padding: 0 1rem; }
-        .search-box {
-            width: 100%; padding: 12px 15px; border: 1px solid #ccc;
-            border-radius: 25px; font-size: 1rem; margin-bottom: 1rem; outline: none;
-        }
-        .search-box:focus { border-color: #4e54c8; }
-
-        .categories-bar {
-            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 1rem;
-            margin-bottom: 1.5rem; border-bottom: 1px solid #e0e0e0;
-        }
-        .cat-btn {
-            background: white; border: 1px solid #ccc; padding: 8px 16px;
-            border-radius: 20px; cursor: pointer; white-space: nowrap; font-weight: 500;
-        }
-        .cat-btn.active { background: #1a1a2e; color: white; border-color: #1a1a2e; }
-
-        /* شبكة المنتجات */
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; }
-        .product-card { 
-            background: white; border-radius: 10px; overflow: hidden; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; position: relative; 
-        }
-        .product-img { width: 100%; height: 180px; object-fit: cover; background: #eee; }
-        .product-info { padding: 1rem; display: flex; flex-direction: column; flex-grow: 1; }
-        .category-tag { font-size: 0.8rem; color: #888; margin-bottom: 5px; }
-        .product-title { font-size: 1.1rem; margin-bottom: 0.5rem; font-weight: bold; }
-        .product-price { font-size: 1.1rem; color: #27ae60; font-weight: bold; margin-bottom: 1rem; }
-        .add-btn { margin-top: auto; background: #1a1a2e; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; }
-        
-        .delete-btn {
-            position: absolute; top: 10px; left: 10px; background: rgba(233, 69, 96, 0.9);
-            color: white; border: none; width: 30px; height: 30px; border-radius: 50%;
-            cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; justify-content: center;
-        }
-
-        /* زر الوضع الثابت في الأسفل */
-        .switch-role-bar {
-            position: fixed; bottom: 0; left: 0; width: 100%; background: #1a1a2e; color: white;
-            padding: 10px; text-align: center; z-index: 99; box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
-            display: flex; justify-content: center; align-items: center; gap: 15px;
-        }
-        .switch-btn { background: #4e54c8; color: white; border: none; padding: 6px 12px; border-radius: 15px; cursor: pointer; }
-
-        /* السلة والنموذج */
-        .modal { position: fixed; top: 0; right: -100%; width: 350px; height: 100%; background: white; box-shadow: -5px 0 15px rgba(0,0,0,0.2); transition: right 0.3s ease; z-index: 101; padding: 1.5rem; display: flex; flex-direction: column; }
-        .modal.active { right: 0; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; padding-bottom: 1rem; }
-        .close-btn { cursor: pointer; font-size: 1.5rem; font-weight: bold; }
-
-        .admin-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); z-index: 102; display: none; width: 90%; max-width: 400px; }
-        .admin-modal input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; }
-        .submit-btn { background: #27ae60; color: white; border: none; width: 100%; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        
-        .cart-items { flex-grow: 1; overflow-y: auto; margin: 1rem 0; }
-        .cart-item { display: flex; justify-content: space-between; margin-bottom: 0.8rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem; }
-        .checkout-btn { background: #25D366; color: white; border: none; width: 100%; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        body { font-family: sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; direction: rtl; }
+        header { text-align: center; padding: 10px; background: #333; color: #fff; border-radius: 8px; }
+        .admin-section { background: #fff; padding: 15px; margin: 20px 0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        input, button { padding: 10px; margin: 5px; width: calc(100% - 22px); border: 1px solid #ccc; border-radius: 5px; }
+        button { background: #28a745; color: white; font-weight: bold; cursor: pointer; border: none; }
+        button.delete-btn { background: #dc3545; width: auto; padding: 5px 10px; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .product-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
+        .product-card img { max-width: 100%; height: 150px; object-fit: cover; border-radius: 5px; }
     </style>
 </head>
 <body>
 
-    <!-- شاشة اختيار الدخول -->
-    <div class="role-overlay" id="roleOverlay">
-        <div class="role-box">
-            <h2>مرحباً بك في المتجر</h2>
-            <button class="role-btn btn-buyer" onclick="setRole('buyer')">أنا مشتري 🛒</button>
-            <button class="role-btn btn-admin" onclick="showAdminPassInput()">أنا صاحب الموقع 🔑</button>
-            
-            <input type="password" id="adminPassword" class="pass-input" placeholder="أدخل كلمة السر ">
-            <button class="role-btn btn-admin" id="passSubmitBtn" style="display:none;" onclick="verifyAdmin()">دخول المسؤول</button>
-        </div>
-    </div>
-
     <header>
-        <div class="logo">متجري الخاص</div>
-        <div class="header-btns">
-            <button class="admin-btn" id="adminAddBtn" onclick="toggleAdminModal()" style="display:none;">+ إضافة منتج</button>
-            <button class="cart-icon" onclick="toggleCart()">🛒 السلة <span class="cart-count" id="cartCount">0</span></button>
-        </div>
+        <h1>Sami Store 🛒</h1>
     </header>
 
-    <div class="container">
-        <!-- شريط البحث -->
-        <input type="text" id="searchInput" class="search-box" placeholder="🔍 ابحث عن اسم المنتج..." oninput="renderProducts()">
-
-        <!-- شريط التصفية بالفئات -->
-        <div class="categories-bar" id="categoriesBar"></div>
-
-        <h2 style="margin-bottom: 1.5rem;">المنتجات المعروضة</h2>
-        <div class="products-grid" id="productsGrid"></div>
+    <div class="admin-section">
+        <h3>إضافة منتج جديد</h3>
+        <input type="text" id="pName" placeholder="اسم المنتج">
+        <input type="number" id="pPrice" placeholder="السعر (د.ج)">
+        <input type="text" id="pImg" placeholder="رابط صورة المنتج">
+        <button onclick="addProduct()">إضافة المنتج</button>
     </div>
 
-    <!-- شريط تنقل سفلي لتغيير الصفة -->
-    <div class="switch-role-bar">
-        <span>الوضع الحالي: <strong id="currentRoleText">مشتري</strong></span>
-        <button class="switch-btn" onclick="openRoleOverlay()">تغيير الوضع 🔄</button>
+    <h2>المنتجات المتاحة</h2>
+    <div class="products-grid" id="productsContainer">
+        <p>جاري تحميل المنتجات...</p>
     </div>
 
-    <!-- نافذة إضافة منتج (خاصة بالمسؤول) -->
-    <div class="admin-modal" id="adminModal">
-        <div class="modal-header">
-            <h3>إضافة منتج جديد</h3>
-            <span class="close-btn" onclick="toggleAdminModal()">&times;</span>
-        </div>
-        <input type="text" id="pName" placeholder="اسم المنتج" required>
-        <input type="number" id="pPrice" placeholder="السعر (د.ج)" required>
-        <input type="text" id="pCategory" placeholder="الفئة (مثال: الإلكترونيات، ملابس)" required>
-        
-        <label style="display:block; margin-top:8px; font-size:0.85rem; color:#555;">اختر صورة من جهازك:</label>
-        <input type="file" id="pFile" accept="image/*" required>
-        
-        <button class="submit-btn" onclick="addNewProduct()">حفظ ونشر المنتج</button>
-    </div>
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    <!-- سلة الشراء -->
-    <div class="modal" id="cartModal">
-        <div class="modal-header">
-            <h3>سلة الطلبات</h3>
-            <span class="close-btn" onclick="toggleCart()">&times;</span>
-        </div>
-        <div class="cart-items" id="cartItems"></div>
-        <div style="font-size: 1.1rem; font-weight: bold; margin-bottom: 1rem;">
-            الإجمالي: <span id="cartTotal">0</span> د.ج
-        </div>
-        <button class="checkout-btn" onclick="sendToWhatsApp()">إرسال الطلب عبر WhatsApp 💬</button>
-    </div>
+        // إعدادات مشروعك الخاط بـ Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDnkOEPVG-soKk6l-dnGZQYKe1cDC2TbuM",
+            authDomain: "samistore-398f8.firebaseapp.com",
+            projectId: "samistore-398f8",
+            storageBucket: "samistore-398f8.firebasestorage.app",
+            messagingSenderId: "874051464169",
+            appId: "1:874051464169:web:56624ad666aec5aff3978",
+            measurementId: "G-06RDDBXB4L"
+        };
 
-    <script>
-        const MY_PHONE_NUMBER = "213555601331";
-        const ADMIN_PASS = "2012";
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-        // المنتج الأساسي (Infinix Hot 50) افتراضياً إذا كان المتجر فارغاً
-        const defaultProducts = [
-            
-        ]
+        // جلب المنتجات من قاعدة البيانات
+        async function loadProducts() {
+            const querySnapshot = await getDocs(collection(db, "products"));
+            const container = document.getElementById("productsContainer");
+            container.innerHTML = "";
 
-        let products = JSON.parse(localStorage.getItem('myProducts')) || defaultProducts;
-        let cart = [];
-        let currentCategory = "الكل";
-        let isAdmin = false;
-
-        function showAdminPassInput() {
-            document.getElementById('adminPassword').style.display = 'block';
-            document.getElementById('passSubmitBtn').style.display = 'block';
+            querySnapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                container.innerHTML += `
+                    <div class="product-card">
+                        <img src="${data.image || 'https://via.placeholder.com/150'}" alt="${data.name}">
+                        <h4>${data.name}</h4>
+                        <p>${data.price} د.ج</p>
+                        <button class="delete-btn" onclick="deleteProduct('${docSnap.id}')">حذف</button>
+                    </div>
+                `;
+            });
         }
 
-        function verifyAdmin() {
-            const pass = document.getElementById('adminPassword').value;
-            if (pass === ADMIN_PASS) {
-                setRole('admin');
-            } else {
-                alert("كلمة السر خاطئة!");
+        // إضافة منتج جديد
+        window.addProduct = async function() {
+            const name = document.getElementById("pName").value;
+            const price = document.getElementById("pPrice").value;
+            const image = document.getElementById("pImg").value;
+
+            if(!name || !price) {
+                alert("يرجى ملء الاسم والسعر على الأقل!");
+                return;
             }
-        }
 
-        function setRole(role) {
-            isAdmin = (role === 'admin');
-            document.getElementById('roleOverlay').style.display = 'none';
-            document.getElementById('adminAddBtn').style.display = isAdmin ? 'block' : 'none';
-            document.getElementById('currentRoleText').innerText = isAdmin ? 'مسؤول (صاحب الموقع)' : 'مشتري';
-            
-            document.getElementById('adminPassword').value = '';
-            document.getElementById('adminPassword').style.display = 'none';
-            document.getElementById('passSubmitBtn').style.display = 'none';
-
-            renderCategories();
-            renderProducts();
-        }
-
-        function openRoleOverlay() {
-            document.getElementById('roleOverlay').style.display = 'flex';
-        }
-
-        function renderCategories() {
-            const categoriesBar = document.getElementById('categoriesBar');
-            const categories = ["الكل", ...new Set(products.map(p => p.category))];
-            
-            categoriesBar.innerHTML = categories.map(cat => `
-                <button class="cat-btn ${cat === currentCategory ? 'active' : ''}" onclick="filterCategory('${cat}')">
-                    ${cat}
-                </button>
-            `).join('');
-        }
-
-        function filterCategory(category) {
-            currentCategory = category;
-            renderCategories();
-            renderProducts();
-        }
-
-        function renderProducts() {
-            const grid = document.getElementById('productsGrid');
-            const searchQuery = document.getElementById('searchInput').value.toLowerCase().trim();
-
-            const filteredProducts = products.filter(p => {
-                const matchesCategory = (currentCategory === "الكل" || p.category === currentCategory);
-                const matchesSearch = p.name.toLowerCase().includes(searchQuery);
-                return matchesCategory && matchesSearch;
+            await addDoc(collection(db, "products"), {
+                name: name,
+                price: price,
+                image: image
             });
 
-            if (filteredProducts.length === 0) {
-                grid.innerHTML = '<p>لا توجد منتجات مطابقة لجميع معايير البحث.</p>';
-                return;
-            }
+            document.getElementById("pName").value = "";
+            document.getElementById("pPrice").value = "";
+            document.getElementById("pImg").value = "";
 
-            grid.innerHTML = filteredProducts.map((p) => {
-                const originalIndex = products.indexOf(p);
-                return `
-                <div class="product-card">
-                    ${isAdmin ? `<button class="delete-btn" onclick="deleteProduct(${originalIndex})" title="حذف المنتج">🗑️</button>` : ''}
-                    <img src="${p.img}" class="product-img" alt="${p.name}">
-                    <div class="product-info">
-                        <span class="category-tag">${p.category}</span>
-                        <div class="product-title">${p.name}</div>
-                        <div class="product-price">${p.price.toLocaleString()} د.ج</div>
-                        <button class="add-btn" onclick="addToCart(${originalIndex})">أضف للسلة</button>
-                    </div>
-                </div>
-            `}).join('');
-        }
+            loadProducts();
+        };
 
-        function deleteProduct(index) {
-            if (confirm("هل أنت تأكد من إزالة هذا المنتج؟")) {
-                products.splice(index, 1);
-                localStorage.setItem('myProducts', JSON.stringify(products));
-                renderCategories();
-                renderProducts();
-            }
-        }
+        // حذف منتج
+        window.deleteProduct = async function(id) {
+            await deleteDoc(doc(db, "products", id));
+            loadProducts();
+        };
 
-        function addNewProduct() {
-            const name = document.getElementById('pName').value;
-            const price = parseFloat(document.getElementById('pPrice').value);
-            const category = document.getElementById('pCategory').value.trim();
-            const fileInput = document.getElementById('pFile');
-            const file = fileInput.files[0];
-
-            if (!name || !price || !category || !file) {
-                alert('يرجى ملء جميع الحقول واختيار صورة!');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const imgBase64 = e.target.result;
-
-                products.push({ name, price, category, img: imgBase64 });
-                localStorage.setItem('myProducts', JSON.stringify(products));
-                
-                document.getElementById('pName').value = '';
-                document.getElementById('pPrice').value = '';
-                document.getElementById('pCategory').value = '';
-                fileInput.value = '';
-                
-                toggleAdminModal();
-                renderCategories();
-                renderProducts();
-            };
-
-            reader.readAsDataURL(file);
-        }
-
-        function addToCart(index) {
-            cart.push(products[index]);
-            updateCart();
-        }
-
-        function updateCart() {
-            document.getElementById('cartCount').innerText = cart.length;
-            const cartItems = document.getElementById('cartItems');
-            cartItems.innerHTML = cart.map(item => `
-                <div class="cart-item">
-                    <span>${item.name}</span>
-                    <strong>${item.price.toLocaleString()} د.ج</strong>
-                </div>
-            `).join('');
-
-            const total = cart.reduce((sum, item) => sum + item.price, 0);
-            document.getElementById('cartTotal').innerText = total.toLocaleString();
-        }
-
-        function sendToWhatsApp() {
-            if (cart.length === 0) {
-                alert('السلة فارغة!');
-                return;
-            }
-
-            const clientName = prompt("يرجى إدخال اسمك الكامل:");
-            const clientAddress = prompt("يرجى إدخال عنوانك (الولاية / البلدية):");
-
-            if (!clientName || !clientAddress) {
-                alert("يجب إدخال معلوماتك لإتمام الطلب!");
-                return;
-            }
-
-            let itemsList = cart.map((item, i) => `${i + 1}. ${item.name} - ${item.price} د.ج`).join('\n');
-            const total = cart.reduce((sum, item) => sum + item.price, 0);
-
-            let message = `مرحباً، أريد تأكيد طلب الشراء من المتجر:\n\n`;
-            message += `👤 الاسم: ${clientName}\n`;
-            message += `📍 العنوان: ${clientAddress}\n\n`;
-            message += `📦 الطلبات:\n${itemsList}\n\n`;
-            message += `💰 الإجمالي: ${total} د.ج`;
-
-            const encodedMessage = encodeURIComponent(message);
-            window.location.href = `https://api.whatsapp.com/send?phone=${MY_PHONE_NUMBER}&text=${encodedMessage}`;
-        }
-
-        function toggleCart() { document.getElementById('cartModal').classList.toggle('active'); }
-        function toggleAdminModal() { 
-            const modal = document.getElementById('adminModal');
-            modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
-        }
-
-        // تشغيل البداية
-        renderCategories();
-        renderProducts();
+        // تحميل المنتجات فور فتح الصفحة
+        loadProducts();
     </script>
 </body>
 </html>
